@@ -53,7 +53,7 @@ class URBaseAvoidanceEnv(URBaseEnv):
                                             string_params = string_params, state_dict = rs_state)
         return state_msg
 
-    def reset(self, joint_positions = JOINT_POSITIONS, fixed_object_position = None) -> np.ndarray:
+    def reset(self, joint_positions = JOINT_POSITIONS, fixed_object_position = None) -> np.array:
         """Environment reset.
 
         Args:
@@ -111,7 +111,7 @@ class URBaseAvoidanceEnv(URBaseEnv):
 
         return state
 
-    def _robot_server_state_to_env_state(self, rs_state) -> np.ndarray:
+    def _robot_server_state_to_env_state(self, rs_state) -> np.array:
         """Transform state from Robot Server to environment format.
 
         Args:
@@ -196,7 +196,8 @@ class URBaseAvoidanceEnv(URBaseEnv):
         else:
             state = np.concatenate((object_polar, joint_positions, delta_joints, np.zeros(3)))
 
-        return state.astype(np.float32)
+        return state
+    
 
     def _get_observation_space(self) -> gym.spaces.Box:
         """Get environment observation space.
@@ -227,7 +228,7 @@ class URBaseAvoidanceEnv(URBaseEnv):
 
         return gym.spaces.Box(low=min_obs, high=max_obs, dtype=np.float32)
 
-    def add_fixed_joints(self, action) -> np.ndarray:
+    def add_fixed_joints(self, action) -> np.array:
         action = action.tolist()
         fixed_joints = np.array([self.fix_base, self.fix_shoulder, self.fix_elbow, self.fix_wrist_1, self.fix_wrist_2, self.fix_wrist_3])
         fixed_joint_indices = np.where(fixed_joints)[0]
@@ -240,7 +241,7 @@ class URBaseAvoidanceEnv(URBaseEnv):
                 temp.append(action.pop(0))
         return np.array(temp)
 
-    def env_action_to_rs_action(self, action) -> np.ndarray:
+    def env_action_to_rs_action(self, action) -> np.array:
         """Convert environment action to Robot Server action"""
         rs_action = copy.deepcopy(action)
 

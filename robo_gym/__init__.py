@@ -46,6 +46,26 @@ register(
 )
 
 register(
+    id='ShelfEnvironmentURSim-v0',
+    entry_point='robo_gym.envs:ShelfEnvironmentURSim',
+)
+
+register(
+    id='ShelfEnvironmentURRob-v0',
+    entry_point='robo_gym.envs:ShelfEnvironmentURRob',
+)
+
+register(
+    id='ShelfEnvironmentPositioningURSim-v0',
+    entry_point='robo_gym.envs:URShelfPositioningSim'
+)
+
+register(
+    id='ShelfEnvironmentPositioningURRob-v0',
+    entry_point='robo_gym.envs:URShelfPositioningRob'
+)
+
+register(
     id='EndEffectorPositioningURSim-v0',
     entry_point='robo_gym.envs:EndEffectorPositioningURSim',
 )

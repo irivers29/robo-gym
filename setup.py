@@ -23,7 +23,6 @@ setuptools.setup(name='robo-gym',
       'gym',
       'robo-gym-server-modules',
       'numpy',
-      'scipy',
       'pyyaml'
       ],
       python_requires='>=3.6',

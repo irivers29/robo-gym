@@ -16,7 +16,7 @@ class UR():
         joint_names (list): Joint names (Standard Indexing)`.
 
     Joint Names (ROS Indexing):
-    [elbow_joint, shoulder_lift_joint, shoulder_pan_joint, wrist_1_joint, wrist_2_joint,
+    [elbow_joint, robotiq_85_left_knuckle_joint, shoulder_lift_joint, shoulder_pan_joint, wrist_1_joint, wrist_2_joint,
      wrist_3_joint]
 
     NOTE: Where not specified, Standard Indexing is used. 
@@ -39,14 +39,18 @@ class UR():
                 print(exc) 
 
         # Joint Names (Standard Indexing):
-        self.joint_names = ["shoulder_pan", "shoulder_lift", "elbow_joint", \
-                         "wrist_1", "wrist_2", "wrist_3"]
+        if model in ["ur10e"]:
+            self.joint_names = ["shoulder_pan", "shoulder_lift", "elbow_joint", \
+                            "wrist_1", "wrist_2", "wrist_3", "robotiq_85_left_knuckle_joint"]
+        else:
+            self.joint_names = ["shoulder_pan", "shoulder_lift", "elbow_joint", \
+                            "wrist_1", "wrist_2", "wrist_3"]
         
         # Initialize joint limits attributes
-        self.max_joint_positions = np.zeros(6)
-        self.min_joint_positions = np.zeros(6)
-        self.max_joint_velocities = np.zeros(6)
-        self.min_joint_velocities = np.zeros(6)
+        self.max_joint_positions = np.zeros(7)
+        self.min_joint_positions = np.zeros(7)
+        self.max_joint_velocities = np.zeros(7)
+        self.min_joint_velocities = np.zeros(7)
 
         for idx,joint in enumerate(self.joint_names):
             self.max_joint_positions[idx] = p["joint_limits"][joint]["max_position"] 
@@ -75,6 +79,11 @@ class UR():
 
         return self.min_joint_velocities
 
+    def grip_to_rs_action(self, grip_action):
+        mult_factor = self.max_joint_positions[6]
+        action = (grip_action + 1)*mult_factor/(2)
+        return np.array([action])
+
     def normalize_joint_values(self, joints):
         """Normalize joint position values
         
@@ -82,12 +91,19 @@ class UR():
             joints (np.array): Joint position values
 
         Returns:
-            norm_joints (np.array): Joint position values normalized between [-1 , 1]
+            norm_joints (np.array): Joint position values normalized between [-1 , 1], except gripper, which is normalized between [0,1]
         """
-        
         joints = copy.deepcopy(joints)
         for i in range(len(joints)):
-            if joints[i] <= 0:
+            if self.min_joint_positions[i] == 0:
+                # for joint gripper, normalize between 0 and 1
+                mult_factor = 1/self.max_joint_positions[i]
+                joints[i] = joints[i] * mult_factor * 2 - 1
+                if joints[i] < -1.0:
+                    joints[i] = -1.0
+                elif joints[i] > 1.0:
+                    joints[i] = 1.0
+            elif joints[i] <= 0:
                 joints[i] = joints[i]/abs(self.min_joint_positions[i])
             else:
                 joints[i] = joints[i]/abs(self.max_joint_positions[i])
@@ -142,7 +158,7 @@ class UR():
 
         """
 
-        return np.array([ros_thetas[2],ros_thetas[1],ros_thetas[0],ros_thetas[3],ros_thetas[4],ros_thetas[5]])
+        return np.array([ros_thetas[2],ros_thetas[6], ros_thetas[1],ros_thetas[0],ros_thetas[3],ros_thetas[4],ros_thetas[5]])
 
     def _ur_joint_list_to_ros_joint_list(self,thetas):
         """Transform joint angles list from standard indexing to ROS indexing.
@@ -159,4 +175,4 @@ class UR():
 
         """
 
-        return np.array([thetas[2],thetas[1],thetas[0],thetas[3],thetas[4],thetas[5]])
+        return np.array([thetas[2],thetas[6], thetas[1],thetas[0],thetas[3],thetas[4],thetas[5]])

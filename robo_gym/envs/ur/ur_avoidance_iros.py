@@ -58,14 +58,14 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
         
         float_params = {"object_0_x_min": -1.0, "object_0_x_max": 1.0, "object_0_y_min": -1.0, "object_0_y_max": 1.0, \
                         "object_0_z_min": 0.1, "object_0_z_max": 1.0, "object_0_n_points": 10, \
-                        "object_0_n_sampling_points": n_sampling_points, "n_sampling_points": n_sampling_points}
+                        "n_sampling_points": n_sampling_points}
         state = {}
 
         state_msg = robot_server_pb2.State(state = state, float_params = float_params, 
                                             string_params = string_params, state_dict = rs_state)
         return state_msg
 
-    def reset(self, fixed_object_position = None) -> np.ndarray:
+    def reset(self, fixed_object_position = None) -> np.array:
         """Environment reset.
 
         Args:
@@ -87,9 +87,6 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
 
     def step(self, action) -> Tuple[np.array, float, bool, dict]:
         if type(action) == list: action = np.array(action)
-
-        action = action.astype(np.float32)
-        
         self.elapsed_steps_in_current_state += 1
         
         state, reward, done, info = super().step(action)
@@ -173,7 +170,7 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
             done = True
             info['final_status'] = 'collision'
 
-        elif self.elapsed_steps >= self.max_episode_steps:
+        if self.elapsed_steps >= self.max_episode_steps:
             done = True
             info['final_status'] = 'success'
         
@@ -182,7 +179,7 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
 
         return reward, done, info
 
-    def _robot_server_state_to_env_state(self, rs_state) -> np.ndarray:
+    def _robot_server_state_to_env_state(self, rs_state) -> np.array:
         """Transform state from Robot Server to environment format.
 
         Args:
@@ -195,7 +192,7 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
 
         state = np.concatenate((state, trajectory_joint_position, [target_point_flag]))
 
-        return state.astype(np.float32)
+        return state
 
     def _get_observation_space(self) -> gym.spaces.Box:
         """Get environment observation space."""
@@ -225,7 +222,7 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
         return gym.spaces.Box(low=min_obs, high=max_obs, dtype=np.float32)
 
 
-    def _get_joint_positions(self) -> np.ndarray:
+    def _get_joint_positions(self) -> np.array:
         """Get robot joint positions with standard indexing."""
 
         if self.elapsed_steps_in_current_state < len(self.trajectory[self.state_n]):
@@ -238,7 +235,7 @@ class AvoidanceIros2021UR(URBaseAvoidanceEnv):
         
         return joint_positions
 
-    def _get_joint_positions_as_array(self) -> np.ndarray:
+    def _get_joint_positions_as_array(self) -> np.array:
         """Get robot joint positions with standard indexing."""
         joint_positions = self._get_joint_positions()
         temp = []

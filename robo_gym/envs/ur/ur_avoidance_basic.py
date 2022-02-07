@@ -63,7 +63,7 @@ class BasicAvoidanceUR(URBaseAvoidanceEnv):
         return state_msg
 
 
-    def reset(self, joint_positions = JOINT_POSITIONS, fixed_object_position = None) -> np.ndarray:
+    def reset(self, joint_positions = JOINT_POSITIONS, fixed_object_position = None) -> np.array:
         """Environment reset.
 
         Args:
@@ -125,7 +125,7 @@ class BasicAvoidanceUR(URBaseAvoidanceEnv):
             info['target_coord'] = obstacle_coord
             self.last_position_on_success = []
 
-        elif self.elapsed_steps >= self.max_episode_steps:
+        if self.elapsed_steps >= self.max_episode_steps:
             done = True
             info['final_status'] = 'success'
             info['target_coord'] = obstacle_coord
@@ -136,8 +136,6 @@ class BasicAvoidanceUR(URBaseAvoidanceEnv):
 
     def step(self, action) -> Tuple[np.array, float, bool, dict]:
         if type(action) == list: action = np.array(action)
-
-        action = action.astype(np.float32)
         
         state, reward, done, info = super().step(action)
 

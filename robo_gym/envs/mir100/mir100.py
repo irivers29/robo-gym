@@ -119,9 +119,6 @@ class Mir100Env(gym.Env):
         return 0, False, {}
 
     def step(self, action):
-        
-        action = action.astype(np.float32)
-
         self.elapsed_steps += 1
 
         # Check if the action is within the action space
@@ -272,7 +269,7 @@ class Mir100Env(gym.Env):
             # Compose environment state
             state = np.concatenate((np.array([polar_r, polar_theta]),rs_state[6:8]))
 
-        return state.astype(np.float32)
+        return state
 
     def _get_observation_space(self):
         """Get environment observation space.
