@@ -21,7 +21,7 @@ from std_msgs.msg import Bool, Header
 
 # base, shoulder, elbow, wrist_1, wrist_2, wrist_3, gripper
 JOINT_POSITIONS = [0.0, -2.5, 1.5, 0.0, -1.4, 2.0, 0.7]
-DISTANCE_THRESHOLD = 0.1
+DISTANCE_THRESHOLD = 0.05
 
 class URShelfPositioning(URBaseEnv):
     def __init__(self, rs_address=None, fix_base=False, fix_shoulder=False,
@@ -323,8 +323,8 @@ class URShelfPositioning(URBaseEnv):
 
         # Reward base
         reward = 0
-        if euclidean_dist_3d < 0.8:
-            reward = 0.8 - euclidean_dist_3d
+        if euclidean_dist_3d < 0.1:
+            reward = 0.1 - euclidean_dist_3d
         # reward = reward + (-1/300)
         
         # Joint positions 

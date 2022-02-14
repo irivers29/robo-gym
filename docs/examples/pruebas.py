@@ -14,7 +14,7 @@ env = ExceptionHandling(env)
 def _image_to_numpy(byte_image) -> np.array:
     "reconvert image in bytes to numpy array"
     np_image = np.frombuffer(byte_image, dtype=np.uint8)
-    np_image = np_image.reshape((480*2,640*2,3))
+    np_image = np_image.reshape((480,640,3))
     #plt.imshow(np_image)
     #plt.show()
 

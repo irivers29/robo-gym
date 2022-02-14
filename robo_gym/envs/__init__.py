@@ -13,3 +13,4 @@ from robo_gym.envs.ur.ur_avoidance_iros import AvoidanceIros2021URSim, Avoidance
 from robo_gym.envs.ur.ur_avoidance_iros import AvoidanceIros2021TestURSim, AvoidanceIros2021TestURRob
 from robo_gym.envs.ur.ur_shelf_env import ShelfEnvironmentURSim, ShelfEnvironmentURRob
 from robo_gym.envs.ur.ur_shelf_env_positioning import URShelfPositioningSim, URShelfPositioningRob
+from robo_gym.envs.ur.ur_shelf_env_pos_image import URShelfPosImSim, URShelfPosImRob

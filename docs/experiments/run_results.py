@@ -27,7 +27,7 @@ env = ExceptionHandling(env)
 log_dir='mon/'
 env = Monitor(env, log_dir)
 
-model = TD3.load("mon/05_02_PositiveReward/best_model")
+model = TD3.load("mon/08_02_positiverewards/best_model")
 
 for i in range(100):
     obs = env.reset()

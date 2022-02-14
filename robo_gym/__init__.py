@@ -1,4 +1,5 @@
 from gym.envs.registration import register
+from importlib_metadata import entry_points
 
 # naming convention: EnvnameRobotSim
 
@@ -63,6 +64,16 @@ register(
 register(
     id='ShelfEnvironmentPositioningURRob-v0',
     entry_point='robo_gym.envs:URShelfPositioningRob'
+)
+
+register(
+    id='ShelfEnvironmentImPositioninsURSim-v0',
+    entry_point='robo_gym.envs:URShelfPosImSim'
+)
+
+register(
+    id='ShelfEnvironmentImPositioninsURRob-v0',
+    entry_point='robo_gym.envs:URShelfPosImRob'
 )
 
 register(
