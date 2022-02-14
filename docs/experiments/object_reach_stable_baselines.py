@@ -9,6 +9,7 @@ from matplotlib.pyplot import plot
 import robo_gym
 from robo_gym.wrappers.exception_handling import ExceptionHandling
 import numpy as np
+import torch
 
 from stable_baselines3 import TD3
 from stable_baselines3.td3 import MlpPolicy
@@ -46,6 +47,8 @@ def main(args):
     print("observation", obs)
     #print("ee_coord", info["ee_coord"])
     #print("target coordinates", info["target_coord"])
+    use_cuda = torch.cuda.is_available()
+    print(use_cuda)
 
     print("-----------------------")
     print('Parameters:')
@@ -58,7 +61,9 @@ def main(args):
 
     callback = SaveOnBestTrainingRewardCallback(check_freq=2000, log_dir=log_dir)
     
-    model = TD3(MlpPolicy, env, verbose=1)
+    #model = TD3(MlpPolicy, env, verbose=1, device='cuda', tensorboard_log="./TD3_positive_reward_tensorboard/")
+    model = TD3.load("mon/08_02_posrew0_5/best_model")
+    model.set_env(env)
     model.learn(total_timesteps=args['num_episodes'], callback=callback)
     model.save('TD3')
     plot_results([log_dir], args["num_episodes"], results_plotter.X_TIMESTEPS, "TD3")
@@ -123,4 +128,4 @@ if __name__ == '__main__':
 
     start_time = datetime.datetime.now()
     main(args)
-    print("---%s seconds---"%(datetime.datetime() - start_time))
+    print("---%s seconds---"%(datetime.datetime.now() - start_time))

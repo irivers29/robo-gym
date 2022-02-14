@@ -27,11 +27,12 @@ env = ExceptionHandling(env)
 log_dir='mon/'
 env = Monitor(env, log_dir)
 
-model = TD3.load("mon/08_02_positiverewards/best_model")
+model = TD3.load("mon/05_02_PositiveReward/best_model")
 
 for i in range(100):
     obs = env.reset()
-    dones = False
-    while not dones:
+    done = False
+
+    while not done:
         action, _states = model.predict(obs)
-        obs, rewards, dones, info = env.step(action)
+        obs, rewards, done, info = env.step(action)

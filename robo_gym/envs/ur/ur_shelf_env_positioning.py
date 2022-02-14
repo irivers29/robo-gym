@@ -323,8 +323,8 @@ class URShelfPositioning(URBaseEnv):
 
         # Reward base
         reward = 0
-        if euclidean_dist_3d < 0.1:
-            reward = 0.1 - euclidean_dist_3d
+        if euclidean_dist_3d < 0.8:
+            reward = 0.8 - euclidean_dist_3d
         # reward = reward + (-1/300)
         
         # Joint positions 
