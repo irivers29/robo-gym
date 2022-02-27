@@ -235,6 +235,10 @@ class URBaseEnv(gym.Env):
     
     def get_image(self):
         return self.client.get_state_msg().image
+    
+    def get_depth(self):
+
+        return self.client.get_state_msg().depth
 
     def get_robot_server_composition(self) -> list:
         rs_state_keys = [
