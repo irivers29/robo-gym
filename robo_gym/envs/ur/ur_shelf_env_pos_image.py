@@ -19,7 +19,7 @@ from scipy.spatial.transform import Rotation as R
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Bool, Header
 
-JOINT_POSITIONS = [0.0, -2.5, 1.5, 0.0, -1.4, 2.0, 0.7]
+JOINT_POSITIONS = [1.6, -2.5, 1.5, 0.0, 0, 2.0, 0.7]
 DISTANCE_THRESHOLD = 0.05
 
 class URShelfImPositioning(URShelfPositioning):
@@ -33,7 +33,7 @@ class URShelfImPositioning(URShelfPositioning):
 
     def _get_observation_space(self) -> gym.spaces.Box:
         
-        return gym.spaces.Box(low=0, high=255, shape = (480, 640, 3), dtype=np.float32)
+        return gym.spaces.Box(low=0, high=255, shape = (388, 363, 3), dtype=np.uint8)
 
     def reset(self, joint_positions = None, ee_target_pose=None) -> np.array:
         """Environment reset.
@@ -155,6 +155,7 @@ class URShelfImPositioning(URShelfPositioning):
         "reconvert image in bytes to numpy array"
         np_image = np.frombuffer(byte_image, dtype=np.uint8)
         np_image = np_image.reshape((480,640,3))
+        np_image = np_image[0:388, 227:590]
         #plt.imshow(np_image)
         #plt.show()
 
@@ -169,7 +170,7 @@ class URShelfPosImSim(URShelfImPositioning, Simulation):
         rviz_gui:=false \
         gazebo_gui:=true \
         rs_mode:=1object \
-        n_objects:=6.0 \
+        n_objects:=3.0 \
         gripper:=true \
         objects_controller:=true \
         object_0_model_name:=coke_can \
@@ -178,12 +179,7 @@ class URShelfPosImSim(URShelfImPositioning, Simulation):
         object_1_frame:=target1 \
         object_2_model_name:=spaghetti \
         object_2_frame:=target2 \
-        object_3_model_name:=pringles_red \
-        object_3_frame:=target3 \
-        object_4_model_name:=tomato_sauce \
-        object_4_frame:=target4 \
-        object_5_model_name:=milk \
-        object_5_frame:=target5"
+        "
     def __init__(self, ip=None, lower_bound_port=None, upper_bound_port=None, gui=False, ur_model='ur10e', **kwargs):
         self.cmd = self.cmd + ' ' + 'ur_model:=' + ur_model
         Simulation.__init__(self, self.cmd, ip, lower_bound_port, upper_bound_port, gui, **kwargs)
@@ -192,3 +188,9 @@ class URShelfPosImSim(URShelfImPositioning, Simulation):
 class URShelfPosImRob(URShelfImPositioning):
     real_robot = True
     
+#object_3_model_name:=pringles_red \
+#object_3_frame:=target3 \
+#object_4_model_name:=tomato_sauce \
+#object_4_frame:=target4 \
+#object_5_model_name:=milk \
+#object_5_frame:=target5"

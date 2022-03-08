@@ -25,7 +25,7 @@ target_machine_ip = '127.0.0.1' # or other machine 'xxx.xxx.xxx.xxx'
 
 best_mean_reward, n_steps = -np.inf, 0
 num_best_model = 0
-time_steps = 1000000
+time_steps = 4000000
 
 def main(args):
 
@@ -62,7 +62,7 @@ def main(args):
     callback = SaveOnBestTrainingRewardCallback(check_freq=2000, log_dir=log_dir)
     
     #model = TD3(MlpPolicy, env, verbose=1, device='cuda', tensorboard_log="./TD3_positive_reward_tensorboard/")
-    model = TD3.load("mon/08_02_posrew0_5/best_model")
+    model = TD3.load("mon/21_02_pos_results/best_model")
     model.set_env(env)
     model.learn(total_timesteps=args['num_episodes'], callback=callback)
     model.save('TD3')
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     parser.add_argument('--lr_actor', help='actor learning rate', default=0.0001)
     parser.add_argument('--lr_critic', help='critic learning rate', default=0.001)
     parser.add_argument('--batch_size', help='batch size', default=64)
-    parser.add_argument('--num_episodes', help='episodes to train', default=1000000)
+    parser.add_argument('--num_episodes', help='episodes to train', default=4000000)
     parser.add_argument('--episodes-length', help='max length for one episode', default=1000)
     parser.add_argument('--HER', help='Hinsight Experience Replay', default=False)
 

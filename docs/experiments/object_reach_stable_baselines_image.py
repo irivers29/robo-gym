@@ -25,7 +25,7 @@ target_machine_ip = '127.0.0.1' # or other machine 'xxx.xxx.xxx.xxx'
 
 best_mean_reward, n_steps = -np.inf, 0
 num_best_model = 0
-time_steps = 1000000
+time_steps = 3000000
 
 def main(args):
 
@@ -42,7 +42,7 @@ def main(args):
     action_dim = env.action_space.shape[0]
     state_dim = observation_dim 
 
-    print("observation", obs)
+    #print("observation", obs)
 
     print("-----------------------")
     print('Parameters:')
@@ -55,11 +55,10 @@ def main(args):
 
     callback = SaveOnBestTrainingRewardCallback(check_freq=2000, log_dir=log_dir)
 
-    action_noise = NormalActionNoise()
+    action_noise = NormalActionNoise(mean = 0, sigma = 0.1)
     
-    model = TD3(CnnPolicy, env, buffer_size=10000,
-                action_noise = action_noise, verbose=1,
-                optimize_memory_usage=True)
+    model = TD3(CnnPolicy, env, buffer_size=10000, verbose=1,
+                optimize_memory_usage=True, action_noise=action_noise, tensorboard_log="./image_reach_tensorboard/")
 
     model.learn(total_timesteps=args['num_episodes'], callback=callback)
     model.save('TD3')

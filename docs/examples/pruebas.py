@@ -8,7 +8,7 @@ import cv2
 target_machine_ip = '127.0.0.1' # or other machine 'xxx.xxx.xxx.xxx'
 
 # initialize environment
-env = gym.make('ShelfEnvironmentURSim-v0', ur_model='ur10e', ip=target_machine_ip, gui=True)
+env = gym.make('ShelfEnvironmentImMIPositioninsURSim-v0', ur_model='ur10e', ip=target_machine_ip, gui=True)
 env = ExceptionHandling(env)
 
 msg_height, msg_width = 480, 640
@@ -16,23 +16,20 @@ msg_height, msg_width = 480, 640
 def _image_to_numpy(byte_image, save_image, episode) -> np.array:
     "reconvert image in bytes to numpy array"
     np_image = np.frombuffer(byte_image, dtype=np.uint8)
-    np_image = np_image.reshape((720,1280,3))
+    np_image = np_image.reshape((480,640,3))
+    np_image = np_image[0:388, 227:590]
+    #print(np_image.dtype)
+    plt.imshow(np_image)
+    plt.show()
     
-    if save_image:
-        plt.imshow(np_image)
-        plt.savefig('./images/shelf' + str(episode) + '.png')
-    #plt.imshow(np_image)
-    #plt.show()
 
     return np_image
 def _depth_to_numpy(byte_depth) -> np.array:
     im = np.ndarray(shape=(msg_height, msg_width),
                            dtype=np.uint16, buffer=byte_depth)
-    
-    #plt.imshow(im)
-    #plt.colorbar()
-    #plt.show()
-    #print(byte_depth)
+    im = im.reshape((480,640,1))
+    image = im.copy()
+    image = image*255.0/image.max()
 
 num_episodes = 20
 

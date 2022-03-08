@@ -21,7 +21,7 @@ from std_msgs.msg import Bool, Header
 
 # base, shoulder, elbow, wrist_1, wrist_2, wrist_3, gripper
 JOINT_POSITIONS = [0.0, -2.5, 1.5, 0.0, -1.4, 2.0, 0.7]
-DISTANCE_THRESHOLD = 0.05
+DISTANCE_THRESHOLD = 0.02
 
 class URShelfPositioning(URBaseEnv):
     def __init__(self, rs_address=None, fix_base=False, fix_shoulder=False,
@@ -311,61 +311,60 @@ class URShelfPositioning(URBaseEnv):
         return reward, done, info
 
     def reward(self, rs_state, action) -> Tuple[float, bool, dict]:
-        reward = 0
-        done = False
-        info = {}
-
-        # Calculate distance to the target
-        target_coord = np.array([rs_state['object_0_to_ref_translation_x'], rs_state['object_0_to_ref_translation_y'], rs_state['object_0_to_ref_translation_z']])
-        ee_coord = np.array([rs_state['ee_to_ref_translation_x'], rs_state['ee_to_ref_translation_y'], rs_state['ee_to_ref_translation_z']])
-        euclidean_dist_3d = np.linalg.norm(target_coord - ee_coord)
-    
-
-        # Reward base
-        reward = 0
-        if euclidean_dist_3d < 0.8:
-            reward = 0.8 - euclidean_dist_3d
-        # reward = reward + (-1/300)
-        
-        # Joint positions 
-        #joint_positions = []
-        #joint_positions_keys = ['base_joint_position', 'shoulder_joint_position', 'elbow_joint_position',
-        #                    'wrist_1_joint_position', 'wrist_2_joint_position', 'wrist_3_joint_position']
-        #for position in joint_positions_keys:
-        #    joint_positions.append(rs_state[position])
-        #joint_positions = np.array(joint_positions)
-        #joint_positions_normalized = self.ur.normalize_joint_values(joint_positions)
-        
-        #delta = np.abs(np.subtract(joint_positions_normalized, action))
-        # reward = reward - (0.05 * np.sum(delta))
-
-
-        if euclidean_dist_3d <= DISTANCE_THRESHOLD:
-            reward = 200
-            done = True
-            info['final_status'] = 'success'
-        
-        if rs_state['in_collision'] == 1:
-            collision = True
-        else:
-            collision = False
-        
-        if collision:
             reward = 0
-            done = True
-            info['final_status'] = 'collision'
+            done = False
+            info = {}
+
+            # Calculate distance to the target
+            target_coord = np.array([rs_state['object_0_to_ref_translation_x'], rs_state['object_0_to_ref_translation_y'], rs_state['object_0_to_ref_translation_z']])
+            ee_coord = np.array([rs_state['ee_to_ref_translation_x'], rs_state['ee_to_ref_translation_y'], rs_state['ee_to_ref_translation_z']])
+            euclidean_dist_3d = np.linalg.norm(target_coord - ee_coord)
+        
+
+            # Reward base
+            reward = 0
+            if euclidean_dist_3d < 0.8:
+                reward = 0.8 - euclidean_dist_3d
+            # reward = reward + (-1/300)
             
+            # Joint positions 
+            #joint_positions = []
+            #joint_positions_keys = ['base_joint_position', 'shoulder_joint_position', 'elbow_joint_position',
+            #                    'wrist_1_joint_position', 'wrist_2_joint_position', 'wrist_3_joint_position']
+            #for position in joint_positions_keys:
+            #    joint_positions.append(rs_state[position])
+            #joint_positions = np.array(joint_positions)
+            #joint_positions_normalized = self.ur.normalize_joint_values(joint_positions)
             
-        # Check if robot is in collision
+            #delta = np.abs(np.subtract(joint_positions_normalized, action))
+            # reward = reward - (0.05 * np.sum(delta))
+
+
+            if euclidean_dist_3d <= DISTANCE_THRESHOLD:
+                reward = 200
+                done = True
+                info['final_status'] = 'success'
             
-        if self.elapsed_steps >= self.max_episode_steps:
-            done = True
-            info['final_status'] = 'max_steps_exceeded'
+            if rs_state['in_collision'] == 1:
+                collision = True
+            else:
+                collision = False
             
-        info['target_coord'] = target_coord
-        info['ee_coord'] = ee_coord
-        print(reward)
-        return reward, done, info
+            if collision:
+                reward = 0
+                done = True
+                info['final_status'] = 'collision'
+                
+                
+            # Check if robot is in collision
+                
+            if self.elapsed_steps >= self.max_episode_steps:
+                done = True
+                info['final_status'] = 'max_steps_exceeded'
+                
+            info['target_coord'] = target_coord
+            info['ee_coord'] = ee_coord
+            return reward, done, info
 
 class URShelfPositioningSim(URShelfPositioning, Simulation):
     cmd = "roslaunch ur_robot_server pruebas.launch \
@@ -376,7 +375,7 @@ class URShelfPositioningSim(URShelfPositioning, Simulation):
         rviz_gui:=false \
         gazebo_gui:=true \
         rs_mode:=1object \
-        n_objects:=6.0 \
+        n_objects:=3.0 \
         gripper:=true \
         objects_controller:=true \
         object_0_model_name:=coke_can \

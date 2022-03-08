@@ -77,6 +77,16 @@ register(
 )
 
 register(
+    id='ShelfEnvironmentImMIPositioninsURSim-v0',
+    entry_point='robo_gym.envs:URShelfPosImMISim'
+)
+
+register(
+    id='ShelfEnvironmentImMIPositioninsURRob-v0',
+    entry_point='robo_gym.envs:URShelfPosImMIRob'
+)
+
+register(
     id='EndEffectorPositioningURSim-v0',
     entry_point='robo_gym.envs:EndEffectorPositioningURSim',
 )

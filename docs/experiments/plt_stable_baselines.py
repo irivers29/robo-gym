@@ -6,7 +6,7 @@ from stable_baselines3.common.monitor import Monitor
 
 import matplotlib.pyplot as plt
 
-log_dir='mon'
+log_dir='mon/'
 
 plot_results([log_dir], 1000000, results_plotter.X_TIMESTEPS, "TD3")
 plt.show()
