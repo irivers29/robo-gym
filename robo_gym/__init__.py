@@ -87,6 +87,16 @@ register(
 )
 
 register(
+    id='ShelfEnvironmentDQNSim-v0',
+    entry_point='robo_gym.envs:URShelfMiDQNSim'
+)
+
+register(
+    id='ShelfEnvironmentDQNRob-v0',
+    entry_point='robo_gym.envs:URShelfMiDQNRob'
+)
+
+register(
     id='EndEffectorPositioningURSim-v0',
     entry_point='robo_gym.envs:EndEffectorPositioningURSim',
 )

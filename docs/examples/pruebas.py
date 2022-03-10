@@ -25,7 +25,7 @@ def _image_to_numpy(byte_image, save_image, episode) -> np.array:
     "reconvert image in bytes to numpy array"
     np_image = np.frombuffer(byte_image, dtype=np.uint8)
     np_image = np_image.reshape((480,640,3))
-    np_image = np_image[0:388, 227:590]
+    #np_image = np_image[0:388, 227:590]
     #print(np_image.dtype)
     plt.imshow(np_image)
     plt.show()
@@ -38,6 +38,8 @@ def _depth_to_numpy(byte_depth) -> np.array:
     im = im.reshape((480,640,1))
     image = im.copy()
     image = image*255.0/image.max()
+    plt.imshow(image.squeeze())
+    plt.show()
 
 num_episodes = 20
 
