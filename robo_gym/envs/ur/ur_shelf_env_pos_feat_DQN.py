@@ -66,9 +66,7 @@ class URShelfDQN(URShelfPositioning):
         #            'image': gym.spaces.Box(low=0, high=255, shape = (388, 363, 3), dtype=np.uint8),
         #            'feature_vector': gym.spaces.Box(low=min_obs, high=max_obs, dtype=np.float32),
         #            'depth_image': gym.spaces.Box(low=0, high=255, shape = (388, 363, 1), dtype=np.uint8)})
-        return gym.spaces.Dict({
-                    'feature_vector': gym.spaces.Box(low=min_obs, high=max_obs, dtype=np.float32),
-                    'depth_image': gym.spaces.Box(low=0, high=255, shape = (388, 363, 1), dtype=np.uint8)})
+        return gym.spaces.Box(low=min_obs, high=max_obs, dtype=np.float32)
 
     def reset(self, joint_positions = None, ee_target_pose=None) -> np.array:
         """Environment reset.
@@ -118,19 +116,18 @@ class URShelfDQN(URShelfPositioning):
 
         rs_state = self.client.get_state_msg().state_dict
         #state_image = self.client.get_state_msg().image
-        state_depth = self.client.get_state_msg().depth
+        #state_depth = self.client.get_state_msg().depth
         
         # Convert image to numpy
         #state_image = self.image_state_to_numpy(state_image)
-        state_depth = self._depth_to_numpy(state_depth)
+        #state_depth = self._depth_to_numpy(state_depth)
 
         # Check if the length and keys of the Robot Server state received is correct
         self._check_rs_state_keys(rs_state)
 
         state_feature = self._robot_server_state_to_env_state(rs_state)
 
-        state ={'feature_vector': state_feature,
-                'depth_image': state_depth} 
+        state = state_feature
 
 
         # Check if the environment state is contained in the observation space
@@ -171,25 +168,27 @@ class URShelfDQN(URShelfPositioning):
         # Convert environment action to robot server action
         rs_action = self.env_action_to_rs_action(action, state_dict)
 
+        no_ik = False
+
         if rs_action is None:
             rs_state = state_dict
+            no_ik = True
         else:
             # Send action to Robot Server and get state
             rs_state = self.client.send_action_get_state(rs_action.tolist()).state_dict
         
         
         #state_image = self.client.get_state_msg().image
-        state_depth = self.client.get_state_msg().depth
+        #state_depth = self.client.get_state_msg().depth
         # Convert image to numpy
         #state_image = self.image_state_to_numpy(state_image)
-        state_depth = self._depth_to_numpy(state_depth)
+        #state_depth = self._depth_to_numpy(state_depth)
 
         
         self._check_rs_state_keys(rs_state)
         state_feature = self._robot_server_state_to_env_state(rs_state)
 
-        state = {'feature_vector': state_feature,
-                'depth_image': state_depth} 
+        state = state_feature
 
         # Check if the environment state is contained in the observation space
         if not self.observation_space.contains(state):
@@ -201,7 +200,7 @@ class URShelfDQN(URShelfPositioning):
         # Assign reward
         reward = 0
         done = False
-        reward, done, info = self.reward(rs_state=rs_state, action=action)
+        reward, done, info = self.reward(rs_state=rs_state, action=action, no_ik=no_ik)
         if self.rs_state_to_info: info['rs_state'] = self.rs_state
 
         return state, reward, done, info
@@ -223,7 +222,7 @@ class URShelfDQN(URShelfPositioning):
         
         return np_depth
         
-    def reward(self, rs_state, action) -> Tuple[float, bool, dict]:
+    def reward(self, rs_state, action, no_ik=False) -> Tuple[float, bool, dict]:
             done = False
             info = {}
 
@@ -235,9 +234,9 @@ class URShelfDQN(URShelfPositioning):
 
             # Reward base
 
-            reward = 0
+            reward = -1
             #if euclidean_dist_3d != 0:
-            reward -= euclidean_dist_3d
+            reward += (1/euclidean_dist_3d)
 
 
             if euclidean_dist_3d <= DISTANCE_THRESHOLD:
@@ -249,7 +248,10 @@ class URShelfDQN(URShelfPositioning):
                 collision = True
             else:
                 collision = False
-            
+            if no_ik:
+                reward = -2
+                done = True
+                info['final_status'] = 'no_ik'
             if collision:
                 reward = -20
                 done = True
@@ -259,7 +261,6 @@ class URShelfDQN(URShelfPositioning):
             # Check if robot is in collision
                 
             if self.elapsed_steps >= self.max_episode_steps:
-                print("max steps exceeded")
                 done = True
                 info['final_status'] = 'max_steps_exceeded'
                 
@@ -321,6 +322,7 @@ class URShelfDQN(URShelfPositioning):
         x = state_dict['tip_to_ref_translation_x']
         y = state_dict['tip_to_ref_translation_y']
         z = state_dict['tip_to_ref_translation_z']
+
         gripper_act = None
         # Forwards
         if discrete_action == 0:
@@ -336,11 +338,9 @@ class URShelfDQN(URShelfPositioning):
             x += 0.02
         # Up
         elif discrete_action == 4:
-            print("Up")
             z += 0.02
         # Down
         elif discrete_action == 5:
-            print("down")
             z -= 0.02
         # Open
         elif discrete_action == 6:
@@ -352,13 +352,13 @@ class URShelfDQN(URShelfPositioning):
         elif discrete_action == 8:
             pass
         
-        # correct z noise
-        z += 0.004
-
+        print("seed state:", seed_state)
         seed_state = self._get_seed_state(state_dict)
         qx, qy, qz, qw = self.euler_to_quat(self.roll, self.pitch, self.yaw)
         solution = self.ik_solver.get_ik(seed_state, x,y,z,qx,qy,qz,qw)
-
+        print("solution", solution)
+        print("discrete_action", discrete_action)
+        print("position", x,y,z,qx,qy,qz,qw)
         if solution == None:
             return None
 

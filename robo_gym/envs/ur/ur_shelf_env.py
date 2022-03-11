@@ -39,7 +39,7 @@ class URBaseEnv(gym.Env):
     real_robot = False
     #max_episode_steps = 300
 
-    def __init__(self, rs_address=None, fix_base=False, fix_shoulder=False, fix_elbow=False, fix_wrist_1=False, fix_wrist_2=False, fix_wrist_3=False, fix_gripper=False, ur_model='ur5', rs_state_to_info=True, max_episode_steps = 100, **kwargs):
+    def __init__(self, rs_address=None, fix_base=False, fix_shoulder=False, fix_elbow=False, fix_wrist_1=False, fix_wrist_2=False, fix_wrist_3=False, fix_gripper=False, ur_model='ur5', rs_state_to_info=True, max_episode_steps = 200, **kwargs):
         self.ur = ur_utils.UR(model=ur_model)
         self.elapsed_steps = 0
         self.max_episode_steps = max_episode_steps

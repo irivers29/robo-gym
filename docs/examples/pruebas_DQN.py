@@ -37,7 +37,7 @@ for episode in range(10):
         #step_space = env.action_space.sample()
         #print(env.action_space.sample())
         #step_space = np.array([0.7519534, 0.46655673, 0.70558476, -0.6050794, -0.7676735, 0.5441871,  0.1002852])
-        state, reward, done, info = env.step(step_space)
+        state, reward, done, info = env.step(0)
         done = False
 
 
