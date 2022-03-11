@@ -16,3 +16,4 @@ from robo_gym.envs.ur.ur_shelf_env_positioning import URShelfPositioningSim, URS
 from robo_gym.envs.ur.ur_shelf_env_pos_image import URShelfPosImSim, URShelfPosImRob
 from robo_gym.envs.ur.ur_shelf_env_pos_image_multiinput import URShelfPosImMISim, URShelfPosImMIRob
 from robo_gym.envs.ur.ur_shelf_env_pos_image_multiinput_DQN import URShelfMiDQNSim, URShelfMiDQNRob
+from robo_gym.envs.ur.ur_shelf_env_pos_feat_DQN import URShelfFeatDQNSim, URShelfFeatDQNRob

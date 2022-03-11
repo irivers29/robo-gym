@@ -29,7 +29,7 @@ time_steps = 3000000
 
 def main(args):
 
-    env = gym.make('ShelfEnvironmentDQNSim-v0', ur_model='ur10e', ip=target_machine_ip, gui=True)
+    env = gym.make('ShelfEnvironmentFeatDQNSim-v0', ur_model='ur10e', ip=target_machine_ip, gui=True)
     env = ExceptionHandling(env)
     log_dir='mon/'
     os.makedirs(log_dir, exist_ok=True)

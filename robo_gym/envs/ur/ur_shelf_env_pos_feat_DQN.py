@@ -24,7 +24,7 @@ from trac_ik_python.trac_ik import IK
 JOINT_POSITIONS = [-1.383, -1.804, -1.526, -2.952, -1.382, -1.571, 0.7]
 DISTANCE_THRESHOLD = 0.1
 
-class URShelfDQN(URShelfPositioning):
+class URShelfFeatDQN(URShelfPositioning):
     def __init__(self, rs_address=None, fix_base=False, fix_shoulder=False,
                  fix_elbow=False, fix_wrist_1=False, fix_wrist_2=False, fix_wrist_3=False, fix_gripper=False,
                  ur_model='ur10e', include_polar_to_elbow=False, rs_state_to_info=True, **kwargs):
@@ -266,6 +266,7 @@ class URShelfDQN(URShelfPositioning):
                 
             info['target_coord'] = target_coord
             info['ee_coord'] = ee_coord
+            print(reward)
             return reward, done, info
     
     def get_robot_server_composition(self) -> list:
@@ -351,6 +352,8 @@ class URShelfDQN(URShelfPositioning):
         # Nothing
         elif discrete_action == 8:
             pass
+
+        z += 0.004
         
         print("seed state:", seed_state)
         seed_state = self._get_seed_state(state_dict)
@@ -397,7 +400,7 @@ class URShelfDQN(URShelfPositioning):
 
         return seed_state
 
-class URShelfMiDQNSim(URShelfDQN, Simulation):
+class URShelfFeatDQNSim(URShelfFeatDQN, Simulation):
     cmd = "roslaunch ur_robot_server pruebas.launch \
         world_name:=shelf.world \
         max_velocity_scale_factor:=0.2 \
@@ -419,9 +422,9 @@ class URShelfMiDQNSim(URShelfDQN, Simulation):
     def __init__(self, ip=None, lower_bound_port=None, upper_bound_port=None, gui=False, ur_model='ur10e', **kwargs):
         self.cmd = self.cmd + ' ' + 'ur_model:=' + ur_model
         Simulation.__init__(self, self.cmd, ip, lower_bound_port, upper_bound_port, gui, **kwargs)
-        URShelfDQN.__init__(self, rs_address=self.robot_server_ip, ur_model=ur_model, **kwargs)
+        URShelfFeatDQN.__init__(self, rs_address=self.robot_server_ip, ur_model=ur_model, **kwargs)
 
-class URShelfMiDQNRob(URShelfDQN):
+class URShelfFeatDQNRob(URShelfFeatDQN):
     real_robot = True
     
 #object_3_model_name:=pringles_red \
